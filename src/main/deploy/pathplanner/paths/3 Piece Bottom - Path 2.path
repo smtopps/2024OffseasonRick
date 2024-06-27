@@ -1,0 +1,131 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.94674718705046,
+        "y": 3.448296347666681
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.725824594506332,
+        "y": 1.2660440905297392
+      },
+      "isLocked": false,
+      "linkedName": "4 Piece Bottom - Path 1"
+    },
+    {
+      "anchor": {
+        "x": 8.163642301310578,
+        "y": 2.3455132624550954
+      },
+      "prevControl": {
+        "x": 5.623558052310911,
+        "y": 1.2713748024898626
+      },
+      "nextControl": {
+        "x": 8.778992564162147,
+        "y": 2.605729585570712
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.94674718705046,
+        "y": 3.448296347666681
+      },
+      "prevControl": {
+        "x": 3.8990727332104016,
+        "y": 0.17324813870406897
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "4 Piece Bottom - Path 1"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 22.975154066030655,
+      "rotateFast": true
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "New Constraints Zone",
+      "minWaypointRelativePos": 0.85,
+      "maxWaypointRelativePos": 1.1,
+      "constraints": {
+        "maxVelocity": 2.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 90.0,
+        "maxAngularAcceleration": 360.0
+      }
+    }
+  ],
+  "eventMarkers": [
+    {
+      "name": "RunIntake",
+      "waypointRelativePos": 0.5,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "autoIntake"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "StopIntake",
+      "waypointRelativePos": 1.2,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "stopIntake"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "AutoAlign",
+      "waypointRelativePos": 0.65,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": []
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 4.35,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 90.0,
+    "maxAngularAcceleration": 360.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -49.94123891252184,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "3 Piece Bottom",
+  "previewStartingState": {
+    "rotation": -50.35582504285519,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}

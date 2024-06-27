@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.9018860901683614,
+        "y": 6.979861215092358
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.767302799522067,
+        "y": 7.5774352980686865
+      },
+      "isLocked": false,
+      "linkedName": "5 Piece Top - Path 2"
+    },
+    {
+      "anchor": {
+        "x": 8.403524339516212,
+        "y": 5.783822476735862
+      },
+      "prevControl": {
+        "x": 7.190787368587724,
+        "y": 6.983232667764035
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.35,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 90.0,
+    "maxAngularAcceleration": 360.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -9.80589066565309,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "5 Piece Top",
+  "previewStartingState": {
+    "rotation": 23.62937773065682,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}
