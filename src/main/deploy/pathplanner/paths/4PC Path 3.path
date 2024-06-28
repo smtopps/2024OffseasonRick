@@ -95,7 +95,7 @@
     "rotateFast": true
   },
   "reversed": false,
-  "folder": "4 Piece Center",
+  "folder": null,
   "previewStartingState": {
     "rotation": 0,
     "velocity": 0

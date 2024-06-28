@@ -117,7 +117,7 @@
     "rotateFast": true
   },
   "reversed": false,
-  "folder": "4 Piece Wing",
+  "folder": null,
   "previewStartingState": {
     "rotation": 19.855214369321153,
     "velocity": 0
