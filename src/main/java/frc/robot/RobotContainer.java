@@ -10,7 +10,9 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.SteerRequestType;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
@@ -19,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.AutoCommands.AutoAlignNotes;
 import frc.robot.commands.AutoCommands.AutoManualShoot;
 import frc.robot.commands.AutoCommands.AutoShootDeflect;
+import frc.robot.commands.AutoCommands.AutoShootOnTheFly;
 import frc.robot.commands.AutoCommands.AutoIntakeStart;
 import frc.robot.commands.AutoCommands.AutoIntakeStop;
 import frc.robot.commands.AutoCommands.AutoShootPose;
@@ -27,6 +30,7 @@ import frc.robot.commands.IntakeCommands.IntakeGround;
 import frc.robot.commands.IntakeCommands.IntakeGroundAlignDrive;
 import frc.robot.commands.IntakeCommands.IntakeTryHarder;
 import frc.robot.commands.ShootCommands.ManualShoot;
+import frc.robot.commands.ShootCommands.RevShooter;
 import frc.robot.commands.ShootCommands.ShootDeflect;
 import frc.robot.commands.ShootCommands.ShootPose;
 import frc.robot.commands.ShootCommands.ShootToZone;
@@ -97,6 +101,7 @@ public class RobotContainer implements Logged{
     //driverController.start().and(driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
     //driverController.start().and(driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
+    shooter.setDefaultCommand(new RevShooter(drivetrain, shooter).onlyWhile(()-> DriverStation.isTeleop()));
 
     driverController.rightBumper().whileTrue(new IntakeGround(intake));
     driverController.rightTrigger(0.05).whileTrue(new IntakeGroundAlignDrive(intake,drivetrain, ()-> driverController.getRightTriggerAxis(),()-> -driverController.getLeftY() * MaxSpeed, ()-> -driverController.getLeftX() * MaxSpeed, ()-> -driverController.getRightX() * MaxAngularRate, drive));
@@ -126,7 +131,9 @@ public class RobotContainer implements Logged{
     NamedCommands.registerCommand("autoAlign", new AutoAlignNotes(drivetrain, intake));
     NamedCommands.registerCommand("deflect", new AutoShootDeflect(shooter, intake, elevator));
     NamedCommands.registerCommand("manuelShoot", new AutoManualShoot(shooter, intake));
+    NamedCommands.registerCommand("shootMove", new AutoShootOnTheFly(drivetrain, shooter, intake));
     autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData("Auto Chooser", autoChooser);
     configureBindings();
   }
 

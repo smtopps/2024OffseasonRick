@@ -53,7 +53,7 @@ public class LimelightAprilTag extends SubsystemBase {
 
       LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(ll);
       SmartDashboard.putNumber("NumTags", limelightMeasurement.tagCount);
-      if(Math.abs(drivetrain.getState().speeds.omegaRadiansPerSecond) > 720) {
+      if(Math.abs(drivetrain.getState().speeds.omegaRadiansPerSecond) > Units.degreesToRadians(720)) {
         reject = true;
       }
       if(limelightMeasurement.tagCount == 0) {

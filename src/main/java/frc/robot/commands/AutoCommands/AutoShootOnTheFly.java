@@ -4,24 +4,34 @@
 
 package frc.robot.commands.AutoCommands;
 
+import org.photonvision.PhotonUtils;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Shooter;
 import frc.robot.constants.IntakeConstants;
 import frc.robot.constants.ShooterConstants;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
 
-public class AutoManualShoot extends Command {
+public class AutoShootOnTheFly extends Command {
+  private final CommandSwerveDrivetrain drivetrain;
   private final Intake intake;
   private final Shooter shooter;
   private final double speed = ShooterConstants.shootingRPS;
   private final double spin = ShooterConstants.spinFactor;
+  private int targetTag;
+  private Pose2d targetPose;
+  private double distanceToTarget;
 
   private boolean finished = false;
   private boolean timeStampLock = true;
   private double shootTime = 0;
-  /** Creates a new ManuelShoot. */
-  public AutoManualShoot(Shooter shooter, Intake intake) {
+  /** Creates a new AutoShootOnTheFly. */
+  public AutoShootOnTheFly(CommandSwerveDrivetrain drivetrain, Shooter shooter, Intake intake) {
+    this.drivetrain = drivetrain;
     this.shooter = shooter;
     this.intake = intake;
     // Use addRequirements() here to declare subsystem dependencies.
@@ -33,6 +43,8 @@ public class AutoManualShoot extends Command {
   public void initialize() {
     shooter.setShooterSpeeds(speed, spin);
     intake.setIntakePosition(IntakeConstants.shootPosition);
+    targetTag = DriverStation.getAlliance().get()==DriverStation.Alliance.Blue?7:4;
+    targetPose = ShooterConstants.aprilTags.getTagPose(targetTag).get().toPose2d();
     timeStampLock = true;
     finished = false;
   }
@@ -40,18 +52,18 @@ public class AutoManualShoot extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intake.log("isIntakeAtPosition", intake.isIntakeAtPosition(IntakeConstants.shootPosition));
-    shooter.log("isShooterAtSpeed", shooter.isShooterAtSpeed(speed, 0.0));
-    if(shooter.isShooterAtSpeed(speed, spin) && intake.isIntakeAtPosition(IntakeConstants.shootPosition)) 
-    {
+    Pose2d currentPose = drivetrain.getState().Pose;
+    distanceToTarget = PhotonUtils.getDistanceToPose(currentPose, targetPose);
+    shooter.log("Distance To Target", distanceToTarget);
 
+    if(intake.isIntakeAtPosition(IntakeConstants.shootPosition) && shooter.isShooterAtSpeed(ShooterConstants.shootingRPS, ShooterConstants.spinFactor) && distanceToTarget < 120) {
       intake.setRollerSpeed(IntakeConstants.shootSpeed);
       if(timeStampLock){
         shootTime = Timer.getFPGATimestamp();
         timeStampLock = false;
       }
 
-      if(!timeStampLock && Timer.getFPGATimestamp() - shootTime > 0.4){
+      if(!timeStampLock && Timer.getFPGATimestamp() - shootTime > 0.2){
         finished = true;
       }
     }

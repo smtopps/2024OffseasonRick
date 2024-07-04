@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.0,
-      "y": 6.0
+      "x": 1.431461994188905,
+      "y": 7.339477040527249
     },
     "rotation": 0
   },
@@ -14,7 +14,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Test 3m"
+            "pathName": "Decision 1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Decision 2-2"
           }
         }
       ]
