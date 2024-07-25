@@ -45,14 +45,14 @@ public class RevShooter extends Command {
   public void execute() {
     Pose2d currentPose = drivetrain.getState().Pose;
     distanceToTarget = PhotonUtils.getDistanceToPose(currentPose, targetPose);
-    if(distanceToTarget < Units.inchesToMeters(200)) {
+    if(distanceToTarget < Units.inchesToMeters(160)) {
       currentState = true;
     }else{
       currentState = false;
     }
 
     if(currentState != previousState && currentState == true) {
-      shooter.setShooterSpeeds(ShooterConstants.ampHandoffRPS, 0.05);
+      shooter.setShooterSpeeds(ShooterConstants.ampHandoffRPS, 0.0);
       previousState = true;
     }else if(currentState != previousState && currentState == false) {
       shooter.stopShooter();

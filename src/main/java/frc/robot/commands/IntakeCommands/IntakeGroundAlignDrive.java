@@ -25,7 +25,7 @@ public class IntakeGroundAlignDrive extends Command {
   private final DoubleSupplier translationY;
   private final DoubleSupplier rotation;
 
-  private final double triggerThreshold = 0.3;
+  private final double triggerThreshold = 0.5;
 
   private PIDController yawPIDController = new PIDController(0.1, 0.0, 0.0);
 
