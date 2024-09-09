@@ -14,6 +14,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.LimelightHelpers;
 import frc.robot.constants.IntakeConstants;
+import frc.robot.constants.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Intake;
 
@@ -32,8 +33,10 @@ public class IntakeGroundAlignDrive extends Command {
   private SwerveRequest.FieldCentric fieldRequest;
   private SwerveRequest.RobotCentric robotRequest = new SwerveRequest.RobotCentric();
 
+  private DoubleSupplier maxSpeed;
+
   /** Creates a new Intake. */
-  public IntakeGroundAlignDrive(Intake intake, CommandSwerveDrivetrain drivetrain, DoubleSupplier triggerTranslation, DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation, SwerveRequest.FieldCentric fieldRequest) {
+  public IntakeGroundAlignDrive(Intake intake, CommandSwerveDrivetrain drivetrain, DoubleSupplier triggerTranslation, DoubleSupplier translationX, DoubleSupplier translationY, DoubleSupplier rotation, SwerveRequest.FieldCentric fieldRequest, DoubleSupplier maxSpeed) {
     this.intake = intake;
     this.drivetrain = drivetrain;
     this.triggerTranslation = triggerTranslation;
@@ -41,6 +44,7 @@ public class IntakeGroundAlignDrive extends Command {
     this.translationY = translationY;
     this.rotation = rotation;
     this.fieldRequest = fieldRequest;
+    this.maxSpeed = maxSpeed;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(intake, drivetrain);
   }
@@ -57,11 +61,17 @@ public class IntakeGroundAlignDrive extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    double topSpeed = 2.0;
+    if(maxSpeed.getAsDouble() == TunerConstants.kSpeedAt12VoltsMps) {
+      topSpeed = 2.0;
+    }else{
+      topSpeed = maxSpeed.getAsDouble();
+    }
     if(LimelightHelpers.getTV("limelight-intake")){
       double yawSpeed = yawPIDController.calculate(LimelightHelpers.getTX("limelight-intake"));
       double xSpeed = MathUtil.inverseInterpolate(triggerThreshold, 1.0, triggerTranslation.getAsDouble());
-      xSpeed = MathUtil.interpolate(0.25, 2.0, xSpeed);
-      if(triggerTranslation.getAsDouble() >= triggerThreshold) {
+      xSpeed = MathUtil.interpolate(0.25, topSpeed, xSpeed);
+      if(triggerTranslation.getAsDouble() >= triggerThreshold && intake.isIntakeAtPosition(IntakeConstants.floorPosition)) {
         drivetrain.setControl(robotRequest.withRotationalRate(yawSpeed).withVelocityX(xSpeed).withVelocityY(translationY.getAsDouble()));
       }else{
         drivetrain.setControl(fieldRequest.withRotationalRate(yawSpeed).withVelocityX(translationX.getAsDouble()).withVelocityY(translationY.getAsDouble()));

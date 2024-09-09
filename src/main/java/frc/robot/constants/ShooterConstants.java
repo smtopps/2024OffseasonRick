@@ -38,7 +38,7 @@ public class ShooterConstants {
     public static final double trapHandoffRPS = 8.4;
     public static final double ampHandoffRPS = 18.84;
 
-    public static final double shootPosition = 2.8448; //112 inches
+    public static final double shootPosition = 2.95; //2.8448
 
     public static final double xSetPoint = 0;
     public static final double ySetPoint = 0;

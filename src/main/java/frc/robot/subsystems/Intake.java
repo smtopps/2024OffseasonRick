@@ -64,6 +64,10 @@ public class Intake extends SubsystemBase implements Logged{
     rollerMotor.set(IntakeConstants.stallSpeed);
   }
 
+  public void setIntakeRollerCurrentLimit(int current) {
+    rollerMotor.setSmartCurrentLimit(current);
+  }
+
   public void setIntakePosition(double position) {
     rotationMotor.setControl(magicRequest.withPosition(position).withSlot(0));
   }

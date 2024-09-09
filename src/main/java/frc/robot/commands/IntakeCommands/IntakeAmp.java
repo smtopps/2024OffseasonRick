@@ -25,6 +25,7 @@ public class IntakeAmp extends Command {
   @Override
   public void initialize() {
     intake.setIntakePosition(IntakeConstants.ampPosition);
+    intake.setIntakeRollerCurrentLimit(100);
     timeStampLock = true;
     finished = false;
   }
@@ -38,7 +39,7 @@ public class IntakeAmp extends Command {
         timeStampLock = false;
       }
 
-      if(!timeStampLock && Timer.getFPGATimestamp() - shootTime > 0.4){
+      if(!timeStampLock && Timer.getFPGATimestamp() - shootTime > 3.0){
         finished = true;
       }
       intake.setRollerSpeed(IntakeConstants.ampSpeed);
@@ -50,6 +51,7 @@ public class IntakeAmp extends Command {
   public void end(boolean interrupted) {
     intake.setIntakePosition(IntakeConstants.stowedPosition);
     intake.setRollerSpeed(IntakeConstants.stallSpeed);
+    intake.setIntakeRollerCurrentLimit(IntakeConstants.rollerMotorCurrentLimit);
     finished = false;
   }
 

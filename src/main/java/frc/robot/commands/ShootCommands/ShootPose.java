@@ -4,6 +4,8 @@
 
 package frc.robot.commands.ShootCommands;
 
+import java.util.function.DoubleSupplier;
+
 import org.photonvision.PhotonUtils;
 
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
@@ -18,6 +20,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.IntakeConstants;
 import frc.robot.constants.ShooterConstants;
+import frc.robot.constants.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -29,6 +32,8 @@ public class ShootPose extends Command {
 
   private final PIDController yawController = new PIDController(0.1, 0, 0);
   private final PIDController distanceController = new PIDController(3.5, 0, 0.02);
+
+  private final DoubleSupplier maxSpeed;
 
   private Rotation2d rotationToTarget;
   private double distanceToTarget;
@@ -42,10 +47,11 @@ public class ShootPose extends Command {
   private boolean timeStampLock = true;
   private double shootTime = 0;
   /** Creates a new ShootPose. */
-  public ShootPose(CommandSwerveDrivetrain drivetrain, Shooter shooter, Intake intake) {
+  public ShootPose(CommandSwerveDrivetrain drivetrain, Shooter shooter, Intake intake, DoubleSupplier maxSpeed) {
     this.drivetrain = drivetrain;
     this.shooter = shooter;
     this.intake = intake;
+    this.maxSpeed = maxSpeed;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(drivetrain, shooter, intake);
   }
@@ -54,12 +60,13 @@ public class ShootPose extends Command {
   @Override
   public void initialize() {
     shooter.setShooterSpeeds(ShooterConstants.shootingRPS, 0.05);
+    intake.setIntakeRollerCurrentLimit(100);
     intake.setIntakePosition(IntakeConstants.shootPosition);
     targetTag = DriverStation.getAlliance().get()==DriverStation.Alliance.Blue?7:4;
     yawController.setSetpoint(180.0);
     yawController.setTolerance(2.0);
     yawController.enableContinuousInput(-180, 180);
-    distanceController.setSetpoint(2.78 ); //2.69
+    distanceController.setSetpoint(3.0); //2.69
     distanceController.setTolerance(Units.inchesToMeters(2.0));
     targetPose = ShooterConstants.aprilTags.getTagPose(targetTag).get().toPose2d();
     timeStampLock = true;
@@ -69,6 +76,13 @@ public class ShootPose extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    double topSpeed = 4.0;
+    if(maxSpeed.getAsDouble() == TunerConstants.kSpeedAt12VoltsMps) {
+      topSpeed = 4.0;
+    }else{
+      topSpeed = maxSpeed.getAsDouble();
+    }
+
     Pose2d currentPose = drivetrain.getState().Pose;
     rotationToTarget = PhotonUtils.getYawToPose(currentPose, targetPose);
     distanceToTarget = PhotonUtils.getDistanceToPose(currentPose, targetPose);
@@ -78,7 +92,7 @@ public class ShootPose extends Command {
     double distanceSpeed;
     if(Math.abs(yawController.getPositionError()) < 10.0) {
       distanceSpeed = distanceController.calculate(distanceToTarget); 
-      distanceSpeed = MathUtil.clamp(distanceSpeed, -4.0, 4.0);
+      distanceSpeed = MathUtil.clamp(distanceSpeed, -topSpeed, topSpeed);
     }else{
       distanceSpeed = 0.0;
     }
@@ -90,7 +104,9 @@ public class ShootPose extends Command {
     intake.log("isIntakeAtPosition", intake.isIntakeAtPosition(IntakeConstants.shootPosition));
     shooter.log("isShooterAtSpeed", shooter.isShooterAtSpeed(ShooterConstants.shootingRPS, 0.05));
 
-    if(yawController.atSetpoint() && distanceController.atSetpoint() && intake.isIntakeAtPosition(IntakeConstants.shootPosition) && shooter.isShooterAtSpeed(ShooterConstants.shootingRPS, 0.05)) {
+    var speeds = drivetrain.getState().speeds;
+    double speed = Math.sqrt(Math.pow(speeds.vxMetersPerSecond, 2) + Math.pow(speeds.vyMetersPerSecond, 2));
+    if(yawController.atSetpoint() && distanceController.atSetpoint() && intake.isIntakeAtPosition(IntakeConstants.shootPosition) && shooter.isShooterAtSpeed(ShooterConstants.shootingRPS, 0.05) && speed < 2.0) {
       intake.setRollerSpeed(IntakeConstants.shootSpeed);
       if(timeStampLock){
         shootTime = Timer.getFPGATimestamp();
@@ -108,6 +124,7 @@ public class ShootPose extends Command {
   public void end(boolean interrupted) {
     intake.setIntakePosition(IntakeConstants.stowedPosition);
     intake.setRollerSpeed(IntakeConstants.stallSpeed);
+    intake.setIntakeRollerCurrentLimit(IntakeConstants.rollerMotorCurrentLimit);
     shooter.stopShooter();
     finished = false;
   }

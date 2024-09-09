@@ -81,7 +81,7 @@ public class ShootToZone extends Command {
     currentPose = drivetrain.getState().Pose;
     distanceToTarget = PhotonUtils.getDistanceToPose(currentPose, targetPose);
     //shootSpeed = 228.98*(Math.pow(10.0, 0.2779*distanceToTarget));
-    shootSpeed = 228.98*(Math.exp(0.2779*distanceToTarget));
+    shootSpeed = (228.98*(Math.exp(0.2779*distanceToTarget)))/60;
     //shootSpeed = 1000;
     SmartDashboard.putNumber("setShootSpeed", shootSpeed);
     shooter.setShooterSpeeds(shootSpeed, 0.0);
@@ -102,7 +102,8 @@ public class ShootToZone extends Command {
 
     shooter.log("isYawAtPosition", yawController.atSetpoint());
     intake.log("isIntakeAtPosition", intake.isIntakeAtPosition(IntakeConstants.shootPosition));
-    shooter.log("isShooterAtSpeed", shooter.isShooterAtSpeed(ShooterConstants.shootingRPS, 0.0));
+    shooter.log("isShooterAtSpeed", shooter.isShooterAtSpeed(shootSpeed, 0.0));
+    shooter.log("LobSpeed", shootSpeed);
 
     if(yawController.atSetpoint() && intake.isIntakeAtPosition(IntakeConstants.shootPosition) && shooter.isShooterAtSpeed(shootSpeed, 0.0)) {
       intake.setRollerSpeed(IntakeConstants.shootSpeed);

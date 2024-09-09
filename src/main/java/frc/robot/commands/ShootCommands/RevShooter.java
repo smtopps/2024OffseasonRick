@@ -4,6 +4,8 @@
 
 package frc.robot.commands.ShootCommands;
 
+import java.util.function.DoubleSupplier;
+
 import org.photonvision.PhotonUtils;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -11,6 +13,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.ShooterConstants;
+import frc.robot.constants.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Shooter;
 
@@ -23,10 +26,12 @@ public class RevShooter extends Command {
   private Pose2d targetPose;
   private boolean previousState;
   private boolean currentState;
+  private final DoubleSupplier maxSpeed;
   /** Creates a new RevShooter. */
-  public RevShooter(CommandSwerveDrivetrain drivetrain, Shooter shooter) {
+  public RevShooter(CommandSwerveDrivetrain drivetrain, Shooter shooter, DoubleSupplier maxSpeed) {
     this.drivetrain = drivetrain;
     this.shooter = shooter;
+    this.maxSpeed = maxSpeed;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(shooter);
   }
@@ -45,7 +50,7 @@ public class RevShooter extends Command {
   public void execute() {
     Pose2d currentPose = drivetrain.getState().Pose;
     distanceToTarget = PhotonUtils.getDistanceToPose(currentPose, targetPose);
-    if(distanceToTarget < Units.inchesToMeters(160)) {
+    if(distanceToTarget < Units.inchesToMeters(160) && maxSpeed.getAsDouble() == TunerConstants.kSpeedAt12VoltsMps) {
       currentState = true;
     }else{
       currentState = false;

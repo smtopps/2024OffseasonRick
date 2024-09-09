@@ -42,12 +42,12 @@ public class LimelightAprilTag extends SubsystemBase {
 
   @Override
   public void periodic() {
-    megaTag1Update();
+    LimelightHelpers.SetRobotOrientation(ll, drivetrain.getState().Pose.getRotation().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0);
+    megaTag2Update();
   }
 
   private void megaTag2Update() {
     if (enable || DriverStation.isDisabled() && !RobotBase.isSimulation()) {
-      LimelightHelpers.SetRobotOrientation(ll, drivetrain.getState().Pose.getRotation().getDegrees(), 0.0, 0.0, 0.0, 0.0, 0.0);
       confidence = 0;
       Boolean reject = false;
 
@@ -128,6 +128,7 @@ public class LimelightAprilTag extends SubsystemBase {
           VecBuilder.fill(confide, confide, 9999999));
     } else {
       SmartDashboard.putBoolean("PoseUpdate", false);
+      SmartDashboard.putNumber("LLConfidence", 0);
       // We are publishing this to view as a ghost to try and help determine when not to use the LL measurements
       //publishToField(new LimelightHelpers.PoseEstimate(new Pose2d(), 0, 0, 0, 0, 0, 0));
       publishToField(new LimelightHelpers.PoseEstimate(new Pose2d(), 0.0, 0.0, 0, 0.0, 0.0, 0.0, null));

@@ -10,6 +10,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.SteerRequestType;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -17,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.commands.ChangeSpeed;
 import frc.robot.commands.AutoCommands.AutoAlignNotes;
 import frc.robot.commands.AutoCommands.AutoManualShoot;
 import frc.robot.commands.AutoCommands.AutoShootDeflect;
@@ -57,7 +58,7 @@ public class RobotContainer implements Logged{
 
   private final SendableChooser<Command> autoChooser;
 
-  private double MaxSpeed = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
+  public double MaxSpeed = TunerConstants.kSpeedAt12VoltsMps; // kSpeedAt12VoltsMps desired top speed
   private double MaxAngularRate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
 
   /* Setting up bindings for necessary control of the swerve drive platform */
@@ -74,7 +75,7 @@ public class RobotContainer implements Logged{
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
       .withSteerRequestType(SteerRequestType.MotionMagic) // I want Motion Magic module steering
-      .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric
+      .withDriveRequestType(DriveRequestType.Velocity); // I want field-centric
                                                                // driving in open loop
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
@@ -88,7 +89,8 @@ public class RobotContainer implements Logged{
         ).ignoringDisable(true));
 
     // reset the field-centric heading on left bumper press
-    driverController.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
+    driverController.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative(new Pose2d())));
+    driverController.back().onTrue(new ChangeSpeed(this));
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
@@ -101,12 +103,12 @@ public class RobotContainer implements Logged{
     //driverController.start().and(driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
     //driverController.start().and(driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-    shooter.setDefaultCommand(new RevShooter(drivetrain, shooter).onlyWhile(()-> DriverStation.isTeleop()));
+    shooter.setDefaultCommand(new RevShooter(drivetrain, shooter, ()-> MaxSpeed).onlyWhile(()-> DriverStation.isTeleop()));
 
     driverController.rightBumper().whileTrue(new IntakeGround(intake));
-    driverController.rightTrigger(0.05).whileTrue(new IntakeGroundAlignDrive(intake,drivetrain, ()-> driverController.getRightTriggerAxis(),()-> -driverController.getLeftY() * MaxSpeed, ()-> -driverController.getLeftX() * MaxSpeed, ()-> -driverController.getRightX() * MaxAngularRate, drive));
+    driverController.rightTrigger(0.05).whileTrue(new IntakeGroundAlignDrive(intake,drivetrain, ()-> driverController.getRightTriggerAxis(),()-> -driverController.getLeftY() * MaxSpeed, ()-> -driverController.getLeftX() * MaxSpeed, ()-> -driverController.getRightX() * MaxAngularRate, drive, ()-> MaxSpeed));
     driverController.leftBumper().whileTrue(new ManualShoot(shooter, intake, ShooterConstants.shootingRPS));
-    driverController.leftTrigger().whileTrue(new ShootPose(drivetrain, shooter, intake));
+    driverController.leftTrigger().whileTrue(new ShootPose(drivetrain, shooter, intake, ()-> MaxSpeed));
     driverController.y().whileTrue(new IntakeAmp(intake));
     driverController.b().onTrue(new AmpSequence(elevator, intake, shooter, trap));
     driverController.rightStick().whileTrue(new AlignAmpSequence(intake, drivetrain, elevator, shooter, trap));
@@ -130,7 +132,8 @@ public class RobotContainer implements Logged{
     NamedCommands.registerCommand("autoShootAlign", new PrintCommand("autoShootAlign"));
     NamedCommands.registerCommand("autoAlign", new AutoAlignNotes(drivetrain, intake));
     NamedCommands.registerCommand("deflect", new AutoShootDeflect(shooter, intake, elevator));
-    NamedCommands.registerCommand("manuelShoot", new AutoManualShoot(shooter, intake));
+    //NamedCommands.registerCommand("manuelShoot", new AutoManualShoot(shooter, intake));
+    NamedCommands.registerCommand("manuelShoot", new AutoShootOnTheFly(drivetrain, shooter, intake));
     NamedCommands.registerCommand("shootMove", new AutoShootOnTheFly(drivetrain, shooter, intake));
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -144,7 +147,7 @@ public class RobotContainer implements Logged{
 
   public void configureAutoSettings() {
     shooter.setShooterSpeeds(ShooterConstants.shootingRPS, 0.05);
-    limelight.useLimelight(false);
+    limelight.useLimelight(true);
   }
 
   public void configureTeleopSettings() {
