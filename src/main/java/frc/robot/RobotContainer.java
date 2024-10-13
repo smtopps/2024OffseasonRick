@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.ChangeSpeed;
+import frc.robot.commands.DriveCommand;
 import frc.robot.commands.AutoCommands.AutoAlignNotes;
 import frc.robot.commands.AutoCommands.AutoManualShoot;
 import frc.robot.commands.AutoCommands.AutoShootDeflect;
@@ -30,6 +31,8 @@ import frc.robot.commands.IntakeCommands.IntakeAmp;
 import frc.robot.commands.IntakeCommands.IntakeGround;
 import frc.robot.commands.IntakeCommands.IntakeGroundAlignDrive;
 import frc.robot.commands.IntakeCommands.IntakeTryHarder;
+import frc.robot.commands.LEDCommands.CheckForNoteCamera;
+import frc.robot.commands.LEDCommands.LEDCommand;
 import frc.robot.commands.ShootCommands.ManualShoot;
 import frc.robot.commands.ShootCommands.RevShooter;
 import frc.robot.commands.ShootCommands.ShootDeflect;
@@ -49,6 +52,7 @@ import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.LEDs;
 import frc.robot.subsystems.LimelightAprilTag;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Trap;
@@ -71,6 +75,7 @@ public class RobotContainer implements Logged{
   private final Elevator elevator = new Elevator();
   private final Trap trap = new Trap();
   private final LimelightAprilTag limelight = new LimelightAprilTag(drivetrain, "limelight-shooter");
+  private final LEDs leds = new LEDs();
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -81,16 +86,21 @@ public class RobotContainer implements Logged{
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
   private void configureBindings() {
-    drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
+    /*drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
         drivetrain.applyRequest(() -> drive.withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive forward with
                                                                                            // negative Y (forward)
             .withVelocityY(-driverController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
             .withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-        ).ignoringDisable(true));
+        ).ignoringDisable(true));*/
+    drivetrain.setDefaultCommand(
+      new DriveCommand(drivetrain, ()-> driverController.getLeftX(), ()-> driverController.getLeftY(), ()-> driverController.getRightX(), ()-> MaxSpeed, ()-> MaxAngularRate).ignoringDisable(true)
+    );
+
+    leds.setDefaultCommand(new LEDCommand(leds, driverController.getHID()).ignoringDisable(true).repeatedly());
 
     // reset the field-centric heading on left bumper press
-    driverController.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative(new Pose2d())));
-    driverController.back().onTrue(new ChangeSpeed(this));
+    driverController.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative(new Pose2d())).ignoringDisable(true));
+    driverController.back().onTrue(new ChangeSpeed(this).ignoringDisable(true));
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
@@ -106,14 +116,14 @@ public class RobotContainer implements Logged{
     shooter.setDefaultCommand(new RevShooter(drivetrain, shooter, ()-> MaxSpeed).onlyWhile(()-> DriverStation.isTeleop()));
 
     driverController.rightBumper().whileTrue(new IntakeGround(intake));
-    driverController.rightTrigger(0.05).whileTrue(new IntakeGroundAlignDrive(intake,drivetrain, ()-> driverController.getRightTriggerAxis(),()-> -driverController.getLeftY() * MaxSpeed, ()-> -driverController.getLeftX() * MaxSpeed, ()-> -driverController.getRightX() * MaxAngularRate, drive, ()-> MaxSpeed));
+    driverController.rightTrigger(0.05).whileTrue(new IntakeGroundAlignDrive(intake,drivetrain, ()-> driverController.getRightTriggerAxis(),()-> -driverController.getLeftY() * MaxSpeed, ()-> -driverController.getLeftX() * MaxSpeed, ()-> -driverController.getRightX() * MaxAngularRate, drive, ()-> MaxSpeed).deadlineWith(new CheckForNoteCamera(leds)).ignoringDisable(true));
     driverController.leftBumper().whileTrue(new ManualShoot(shooter, intake, ShooterConstants.shootingRPS));
-    driverController.leftTrigger().whileTrue(new ShootPose(drivetrain, shooter, intake, ()-> MaxSpeed));
+    driverController.leftTrigger().whileTrue(new ShootPose(drivetrain, shooter, intake, ()-> MaxSpeed).deadlineWith(new InstantCommand(()->leds.setLED(0, 0, 255, 8, 64), leds)).ignoringDisable(true));
     driverController.y().whileTrue(new IntakeAmp(intake));
     driverController.b().onTrue(new AmpSequence(elevator, intake, shooter, trap));
-    driverController.rightStick().whileTrue(new AlignAmpSequence(intake, drivetrain, elevator, shooter, trap));
+    driverController.rightStick().whileTrue(new AlignAmpSequence(intake, drivetrain, elevator, shooter, trap).deadlineWith(new InstantCommand(()->leds.setLED(0, 0, 255, 8, 64), leds)).ignoringDisable(true));
     driverController.a().whileTrue(new ShootDeflect(shooter, intake, elevator));
-    driverController.leftStick().whileTrue(new ShootToZone(drivetrain, shooter, intake, MaxSpeed, MaxAngularRate, ()-> -driverController.getLeftY() * MaxSpeed, ()-> -driverController.getLeftX() * MaxSpeed));
+    driverController.leftStick().whileTrue(new ShootToZone(drivetrain, shooter, intake, MaxSpeed, MaxAngularRate, ()-> -driverController.getLeftY() * MaxSpeed, ()-> -driverController.getLeftX() * MaxSpeed).deadlineWith(new InstantCommand(()->leds.setLED(0, 0, 255, 8, 64), leds)).ignoringDisable(true));
 
     operatorController.a().whileTrue(new ClimberManual(climber, ()-> -operatorController.getLeftY())).onFalse(new ClimberHold(climber));
     operatorController.y().whileTrue(new ElevatorManual(elevator, ()-> operatorController.getLeftY())).onFalse(new ElevatorHold(elevator));
@@ -132,8 +142,9 @@ public class RobotContainer implements Logged{
     NamedCommands.registerCommand("autoShootAlign", new PrintCommand("autoShootAlign"));
     NamedCommands.registerCommand("autoAlign", new AutoAlignNotes(drivetrain, intake));
     NamedCommands.registerCommand("deflect", new AutoShootDeflect(shooter, intake, elevator));
-    //NamedCommands.registerCommand("manuelShoot", new AutoManualShoot(shooter, intake));
-    NamedCommands.registerCommand("manuelShoot", new AutoShootOnTheFly(drivetrain, shooter, intake));
+    NamedCommands.registerCommand("manuelShoot", new AutoManualShoot(shooter, intake));
+    //NamedCommands.registerCommand("manuelShoot", new AutoShootOnTheFly(drivetrain, shooter, intake));
+    NamedCommands.registerCommand("moveShoot", new AutoShootOnTheFly(drivetrain, shooter, intake));
     NamedCommands.registerCommand("shootMove", new AutoShootOnTheFly(drivetrain, shooter, intake));
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);

@@ -84,7 +84,7 @@ public class Elevator extends SubsystemBase implements Logged {
     talonfxConfigs.Feedback = ElevatorConstants.elevatorFeedbackConfigs;
     talonfxConfigs.MotionMagic = ElevatorConstants.elevatorMotionMagicConfigs;
     talonfxConfigs.SoftwareLimitSwitch = ElevatorConstants.elevatorSoftwareLimitSwitchConfigs;
-    talonfxConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    talonfxConfigs.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     leftElevatorMotor.getConfigurator().apply(talonfxConfigs);
     leftElevatorMotor.setInverted(true);
     leftElevatorMotor.setPosition(0.0);

@@ -70,6 +70,7 @@ public class IntakeGroundAlignDrive extends Command {
     if(LimelightHelpers.getTV("limelight-intake")){
       double yawSpeed = yawPIDController.calculate(LimelightHelpers.getTX("limelight-intake"));
       double xSpeed = MathUtil.inverseInterpolate(triggerThreshold, 1.0, triggerTranslation.getAsDouble());
+      //xSpeed = Math.pow(xSpeed, 3.0);
       xSpeed = MathUtil.interpolate(0.25, topSpeed, xSpeed);
       if(triggerTranslation.getAsDouble() >= triggerThreshold && intake.isIntakeAtPosition(IntakeConstants.floorPosition)) {
         drivetrain.setControl(robotRequest.withRotationalRate(yawSpeed).withVelocityX(xSpeed).withVelocityY(translationY.getAsDouble()));

@@ -106,14 +106,14 @@ public class ShootPose extends Command {
 
     var speeds = drivetrain.getState().speeds;
     double speed = Math.sqrt(Math.pow(speeds.vxMetersPerSecond, 2) + Math.pow(speeds.vyMetersPerSecond, 2));
-    if(yawController.atSetpoint() && distanceController.atSetpoint() && intake.isIntakeAtPosition(IntakeConstants.shootPosition) && shooter.isShooterAtSpeed(ShooterConstants.shootingRPS, 0.05) && speed < 2.0) {
+    if(yawController.atSetpoint() && distanceController.atSetpoint() && intake.isIntakeAtPosition(IntakeConstants.shootPosition) && shooter.isShooterAtSpeed(ShooterConstants.shootingRPS, 0.05) && speed < 1.0) {
       intake.setRollerSpeed(IntakeConstants.shootSpeed);
       if(timeStampLock){
         shootTime = Timer.getFPGATimestamp();
         timeStampLock = false;
       }
 
-      if(!timeStampLock && Timer.getFPGATimestamp() - shootTime > 0.4){
+      if(!timeStampLock && Timer.getFPGATimestamp() - shootTime > 0.2){
         finished = true;
       }
     };

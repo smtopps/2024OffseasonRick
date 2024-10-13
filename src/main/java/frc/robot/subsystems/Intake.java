@@ -38,7 +38,7 @@ public class Intake extends SubsystemBase implements Logged{
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    intakePose = new Pose3d(0.32004, 0, 0.280616, new Rotation3d(0, -Units.rotationsToRadians(rotationMotor.getPosition().getValueAsDouble()), 0));
+    intakePose = new Pose3d(0.32004, 0, 0.280616, new Rotation3d(0, -Units.rotationsToRadians(rotationMotor.getPosition().getValueAsDouble()-0.448), 0));
   }
   
   private void configureRotationMotor() {
