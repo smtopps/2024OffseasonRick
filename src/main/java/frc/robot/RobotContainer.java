@@ -145,7 +145,6 @@ public class RobotContainer implements Logged{
     NamedCommands.registerCommand("manuelShoot", new AutoManualShoot(shooter, intake));
     //NamedCommands.registerCommand("manuelShoot", new AutoShootOnTheFly(drivetrain, shooter, intake));
     NamedCommands.registerCommand("moveShoot", new AutoShootOnTheFly(drivetrain, shooter, intake));
-    NamedCommands.registerCommand("shootMove", new AutoShootOnTheFly(drivetrain, shooter, intake));
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
     configureBindings();

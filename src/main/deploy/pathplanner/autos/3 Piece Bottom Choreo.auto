@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3363329583802028,
-      "y": 5.541275082550166
+      "x": 0.757132887840271,
+      "y": 4.431430339813232
     },
-    "rotation": 0
+    "rotation": -60.25510186874678
   },
   "command": {
     "type": "sequential",
@@ -20,7 +20,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Big Piece Path 1"
+            "pathName": "Sophia.1"
           }
         },
         {
@@ -32,7 +32,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "DM5P Path 2"
+            "pathName": "Sophia.2"
           }
         },
         {
@@ -40,10 +40,16 @@
           "data": {
             "name": "autoShoot"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Sophia.3"
+          }
         }
       ]
     }
   },
   "folder": null,
-  "choreoAuto": false
+  "choreoAuto": true
 }

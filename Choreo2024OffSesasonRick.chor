@@ -4207,7 +4207,7 @@
                     "command": {
                         "type": "named",
                         "data": {
-                            "name": "manuelShoot"
+                            "name": "moveShoot"
                         }
                     }
                 },
@@ -22898,7 +22898,7 @@
                     "command": {
                         "type": "named",
                         "data": {
-                            "name": "manuelShoot"
+                            "name": "moveShoot"
                         }
                     }
                 },
@@ -22989,20 +22989,7 @@
                     "command": {
                         "type": "named",
                         "data": {
-                            "name": ""
-                        }
-                    }
-                },
-                {
-                    "name": "Marker",
-                    "target": 14,
-                    "trajTargetIndex": 14,
-                    "targetTimestamp": 13.648072172193764,
-                    "offset": 0,
-                    "command": {
-                        "type": "named",
-                        "data": {
-                            "name": "manuelShoot"
+                            "name": "moveShoot"
                         }
                     }
                 }

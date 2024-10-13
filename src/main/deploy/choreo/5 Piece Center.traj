@@ -5172,7 +5172,7 @@
       "command": {
         "type": "named",
         "data": {
-          "name": "manuelShoot"
+          "name": "moveShoot"
         }
       }
     },
@@ -5239,16 +5239,7 @@
       "command": {
         "type": "named",
         "data": {
-          "name": ""
-        }
-      }
-    },
-    {
-      "timestamp": 13.648072172193764,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "manuelShoot"
+          "name": "moveShoot"
         }
       }
     }

@@ -2579,7 +2579,7 @@
       "command": {
         "type": "named",
         "data": {
-          "name": "manuelShoot"
+          "name": "moveShoot"
         }
       }
     },

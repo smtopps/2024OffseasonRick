@@ -2315,16 +2315,7 @@
       "command": {
         "type": "named",
         "data": {
-          "name": ""
-        }
-      }
-    },
-    {
-      "timestamp": 5.301207534991386,
-      "command": {
-        "type": "named",
-        "data": {
-          "name": "manuelShoot"
+          "name": "moveShoot"
         }
       }
     }
