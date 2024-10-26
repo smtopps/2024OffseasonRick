@@ -41,7 +41,7 @@ public class ClimberConstants {
         .withReverseSoftLimitThreshold(-0.5);
     public static final int rightClimberMotorID = 27;
 
-    public static final double midCamClearPosition = 0.546783;
+    public static final double midCamClearPosition = 1.0; //0.546783
     public static final double climbingPosition = 3.6;
     public static final double positionError = 0.05;
     public static final double readyToClimbPosition = 3.0;

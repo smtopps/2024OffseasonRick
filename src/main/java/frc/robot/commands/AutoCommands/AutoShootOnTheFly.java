@@ -57,7 +57,7 @@ public class AutoShootOnTheFly extends Command {
     distanceToTarget = PhotonUtils.getDistanceToPose(currentPose, targetPose);
     shooter.log("Distance To Target", distanceToTarget);
 
-    if(intake.isIntakeAtPosition(IntakeConstants.shootPosition) && shooter.isShooterAtSpeed(ShooterConstants.shootingRPS, ShooterConstants.spinFactor) && distanceToTarget < Units.inchesToMeters(160.0)) {
+    if(intake.isIntakeAtPosition(IntakeConstants.shootPosition) && shooter.isShooterAtSpeed(ShooterConstants.shootingRPS, ShooterConstants.spinFactor) && distanceToTarget < Units.inchesToMeters(180.0)) {
       intake.setRollerSpeed(IntakeConstants.shootSpeed);
       if(timeStampLock){
         shootTime = Timer.getFPGATimestamp();

@@ -75,7 +75,7 @@
             {
               "type": "named",
               "data": {
-                "name": "autoIntake"
+                "name": "startIntake"
               }
             }
           ]
@@ -129,7 +129,7 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": "3 Piece Bottom",
+  "folder": null,
   "previewStartingState": {
     "rotation": -60.11952547325142,
     "velocity": 0

@@ -2691,7 +2691,7 @@
   ],
   "eventMarkers": [
     {
-      "timestamp": 1.4408756861164154,
+      "timestamp": 1,
       "command": {
         "type": "sequential",
         "data": {
